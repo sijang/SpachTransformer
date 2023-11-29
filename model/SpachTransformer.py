@@ -289,7 +289,7 @@ class SpachTransformer(nn.Module):
         self.output = nn.Conv3d(int(dim * 2), out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
 
 
-        # Swin Transformer configuration for swin_stages == 4
+        # Swin Transformer configuration 
         swin_depths      = (4, 8)
         swin_num_heads   = (4, 8)
         swin_out_indices = (0, 1)
