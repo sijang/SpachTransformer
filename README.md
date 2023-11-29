@@ -51,4 +51,4 @@ If you use Spach Transformer, please consider citing:
 Should you have any question, please contact sjang7@mgh.harvard.edu
 
 
-**Acknowledgment:** This code is based on the [Restormer](https://github.com/swz30/Restormer). 
+**Acknowledgment:** This code is based on the [Restormer](https://github.com/swz30/Restormer) and [Swin Transformer](https://github.com/microsoft/Swin-Transformer).
