@@ -24,9 +24,9 @@ See [INSTALL.md](INSTALL.md) for the installation of dependencies required to ru
 import torch
 from model.SpachTransformer import SpachTransformer
 
-model = SpachTransformer()
-input = torch.rand(1, 1, 96, 96, 96)
-output = model(input)
+input   = torch.rand(1, 1, 96, 96, 96)
+model   = SpachTransformer()
+output  = model(input)
 ```
 
 <hr />
