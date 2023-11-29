@@ -96,7 +96,7 @@ class Attention(nn.Module):
     """
     Implements the Multi-DConv Head Transposed Self-Attention (MDTA) mechanism.
     """
-    def __init__(self, dim, num_heads, bias, locked_attn):
+    def __init__(self, dim, num_heads, bias):
         super().__init__()
         self.num_heads = num_heads
         self.temperature = nn.Parameter(torch.ones(num_heads, 1, 1))
@@ -104,9 +104,6 @@ class Attention(nn.Module):
         self.qkv = nn.Conv3d(dim, dim * m, kernel_size=1, bias=bias)
         self.qkv_dwconv = nn.Conv3d(dim * m, dim * m, kernel_size=3, stride=1, padding=1, groups=dim * m, bias=bias)
         self.project_out = nn.Conv3d(dim, dim, kernel_size=1, bias=bias)
-        self.locked_attn = locked_attn
-        if self.locked_attn == 1:
-            self.w = nn.Parameter(torch.diag(torch.rand(int(dim / num_heads))))
 
     def forward(self, x):
         b, c, h, w, d = x.shape
@@ -118,9 +115,6 @@ class Attention(nn.Module):
 
         q = torch.nn.functional.normalize(q, dim=-1)
         k = torch.nn.functional.normalize(k, dim=-1)
-
-        if self.locked_attn:
-            k = self.w @ k
 
         attn = (q @ k.transpose(-2, -1)) * self.temperature
         attn = attn.softmax(dim=-1)
