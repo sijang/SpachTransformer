@@ -273,20 +273,20 @@ class SpachTransformer(nn.Module):
 
         self.up2_1 = UpsampleSimple(int(dim * 2))
         self.decoder_level1 = nn.Sequential(
-            *[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim * 2), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[0])]
         )
 
         # Refinement blocks (optional)
         self.refinement = nn.Sequential(
-            *[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim * 2), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(3)]  # Number of refinement blocks can be adjusted
         )
 
         # Final output layer
-        self.output = nn.Conv3d(dim, out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.output = nn.Conv3d(int(dim * 2), out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
 
 
         # Swin Transformer configuration for swin_stages == 4
