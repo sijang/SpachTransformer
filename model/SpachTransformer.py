@@ -309,7 +309,7 @@ class SpachTransformer(nn.Module):
 
     def forward(self, inp_img):
         # Process input through patch embedding and initial encoding levels
-        inp_enc_level1 = self.patch_embed(inp_img if self.cross == 0 else pet_img)
+        inp_enc_level1 = self.patch_embed(inp_img)
         out_enc_level1 = self.encoder_level1(inp_enc_level1)
         inp_enc_level2 = self.down1_2(out_enc_level1)
         out_enc_level2 = self.encoder_level2(inp_enc_level2)
@@ -321,7 +321,7 @@ class SpachTransformer(nn.Module):
         latent = self.latent(inp_enc_level4)
 
         # Swin Transformer processing
-        swin_output = self.swin(inp_img if self.cross == 0 else pet_img)
+        swin_output = self.swin(inp_img)
 
         # Processing Swin Transformer outputs
         swin_latent, swin_out_enc_level1 = swin_output[-1], swin_output[-2]
