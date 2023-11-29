@@ -10,3 +10,22 @@
 
 > **Abstract:** *Position emission tomography (PET) is widely used in clinics and research due to its quantitative merits and high sensitivity, but suffers from low signal-to-noise ratio (SNR). Recently convolutional neural networks (CNNs) have been widely used to improve PET image quality. Though successful and efficient in local feature extraction, CNN cannot capture long-range dependencies well due to its limited receptive field. Global multi-head self-attention (MSA) is a popular approach to capture long-range information. However, the calculation of global MSA for 3D images has high computational costs. In this work, we proposed an efficient spatial and channel-wise encoder-decoder transformer, Spach Transformer, that can leverage spatial and channel information based on local and global MSAs. Experiments based on datasets of different PET tracers, i.e., 18F-FDG, 18F-ACBC, 18F-DCFPyL, and 68Ga-DOTATATE, were conducted to evaluate the proposed framework. Quantitative results show that the proposed Spach Transformer can achieve better performance than other reference methods.* 
 <hr />
+
+
+
+## Citation
+If you use Spach Transformer, please consider citing:
+
+    @article{jang2022spach, 
+        title={Spach Transformer: Spatial and channel-wise transformer based on local and global self-attentions for PET image denoising}, 
+        author={Jang, Se-In and Pan, Tinsu and Li, Ye and Heidari, Pedram and Chen, Junyu and Li, Quanzheng and Gong, Kuang}, 
+        journal={arXiv preprint arXiv:2209.03300}, 
+        year={2023} }
+    }
+
+
+## Contact
+Should you have any question, please contact sjang7@mgh.harvard.edu
+
+
+**Acknowledgment:** This code is based on the [Restormer](https://github.com/swz30/Restormer). 
