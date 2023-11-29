@@ -6,7 +6,7 @@
 
 [![paper](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/abs/2209.03300)
 
-### News
+### News 
 - **Nov 2023:** Accepted in IEEE Transactions on Medical Imaging! [[Paper]](https://ieeexplore.ieee.org/document/10327759)
 
 ### Brief Introduction
