@@ -1,5 +1,5 @@
 
-## Spach Transformer: Spatial and Channel-wise Transformer Based on Local and Global Self-attentions for PET Image Denoising
+# Spach Transformer: Spatial and Channel-wise Transformer Based on Local and Global Self-attentions for PET Image Denoising
 
 
 [Se-In Jang](https://scholar.google.co.kr/citations?user=I7zRmqkAAAAJ&hl=en), [Tinsu Pan](https://faculty.mdanderson.org/profiles/tinsu_pan.html), [Gary Y. Li](https://scholar.google.com/citations?user=Zy1GPkUAAAAJ&hl=en), [Pedram Heidari](https://scholar.google.com/citations?hl=en&user=V9faymoAAAAJ&view_op=list_works&sortby=pubdate), [Junyu Chen](https://scholar.google.com/citations?hl=en&user=9jIpgScAAAAJ&view_op=list_works&sortby=pubdate), [Quanzheng Li](https://scholar.google.com/citations?hl=en&user=MHq2z7oAAAAJ), and [Kuang Gong](https://scholar.google.com/citations?user=zc6kc4kAAAAJ&hl=en)
@@ -17,6 +17,17 @@
 ### Installation
 
 See [INSTALL.md](INSTALL.md) for the installation of dependencies required to run Spach Transformer.
+
+
+### How to run
+```
+import torch
+from model.SpachTransformer import SpachTransformer
+
+model = SpachTransformer()
+input = torch.rand(1, 1, 96, 96, 96)
+output = model(input)
+```
 
 <hr />
 
