@@ -1,14 +1,22 @@
 
-# Spach Transformer: Spatial and Channel-wise Transformer Based on Local and Global Self-attentions for PET Image Denoising
+## Spach Transformer: Spatial and Channel-wise Transformer Based on Local and Global Self-attentions for PET Image Denoising
 
 
 [Se-In Jang](https://scholar.google.co.kr/citations?user=I7zRmqkAAAAJ&hl=en), [Tinsu Pan](https://faculty.mdanderson.org/profiles/tinsu_pan.html), [Gary Y. Li](https://scholar.google.com/citations?user=Zy1GPkUAAAAJ&hl=en), [Pedram Heidari](https://scholar.google.com/citations?hl=en&user=V9faymoAAAAJ&view_op=list_works&sortby=pubdate), [Junyu Chen](https://scholar.google.com/citations?hl=en&user=9jIpgScAAAAJ&view_op=list_works&sortby=pubdate), [Quanzheng Li](https://scholar.google.com/citations?hl=en&user=MHq2z7oAAAAJ), and [Kuang Gong](https://scholar.google.com/citations?user=zc6kc4kAAAAJ&hl=en)
 
 [![paper](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/abs/2209.03300)
 
-#### News
+### News
 - **Nov 2023:** Accepted in IEEE Transactions on Medical Imaging!
 
+### Brief Introduction
+- The focus of this project is on handling 3D PET input data.
+- It incorporates a 3D-based approach, utilizing both the Swin Transformer and Restormer architectures specifically adapted for 3D data processing.
+
+
+### Installation
+
+See [INSTALL.md](INSTALL.md) for the installation of dependencies required to run Spach Transformer.
 
 <hr />
 
@@ -17,18 +25,18 @@
 
 
 
-## Citation
+### Citation
 If you use Spach Transformer, please consider citing:
 
     @article{jang2022spach, 
         title={Spach Transformer: Spatial and channel-wise transformer based on local and global self-attentions for PET image denoising}, 
         author={Jang, Se-In and Pan, Tinsu and Li, Ye and Heidari, Pedram and Chen, Junyu and Li, Quanzheng and Gong, Kuang}, 
         journal={arXiv preprint arXiv:2209.03300}, 
-        year={2023} }
+        year={2022} }
     }
 
 
-## Contact
+### Contact
 Should you have any question, please contact sjang7@mgh.harvard.edu
 
 
