@@ -20,7 +20,7 @@ See [INSTALL.md](INSTALL.md) for the installation of dependencies required to ru
 
 
 ### Quick Run
-```
+```python
 import torch
 from model.SpachTransformer import SpachTransformer
 
