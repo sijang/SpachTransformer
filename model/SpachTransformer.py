@@ -146,35 +146,6 @@ class TransformerBlock(nn.Module):
         x = x + self.ffn(self.norm2(x))
         return x
 
-class TransformerBlockSimple(nn.Module):
-    """
-    A simplified Transformer block with optional convolutional layers and attention locking.
-    """
-    def __init__(self, dim, num_heads, ffn_expansion_factor, bias, layer_norm_type, conv_type, pre_post_norm, locked_attn):
-        super().__init__()
-        self.conv_type = conv_type
-        self.pre_post_norm = pre_post_norm
-        self.norm1 = LayerNorm(dim, layer_norm_type)
-        self.attn = Attention(dim, num_heads, bias, locked_attn)
-        self.norm2 = LayerNorm(dim, layer_norm_type)
-        self.ffn = FeedForward(dim, ffn_expansion_factor, bias)
-
-        if self.conv_type == 1:
-            self.norm3 = LayerNorm(dim, layer_norm_type)
-            self.ffn2 = FeedForward(dim, ffn_expansion_factor, bias)
-
-    def forward(self, x):
-        if self.pre_post_norm == 0:  # Pre-norm
-            x = x + self.attn(self.norm1(x))
-            x = x + self.ffn(self.norm2(x))
-            if self.conv_type == 1:
-                x = x + self.ffn2(self.norm3(x))
-        else:  # Post-norm
-            x = x + self.norm1(self.attn(x))
-            x = x + self.norm2(self.ffn(x))
-            if self.conv_type == 1:
-                x = x + self.norm3(self.ffn2(x))
-        return x
 
 class OverlapPatchEmbed(nn.Module):
     """
@@ -260,7 +231,7 @@ class SpachTransformer(nn.Module):
 
         # Encoder layers
         self.encoder_level1 = nn.Sequential(
-            *[TransformerBlockSimple(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type 
                                      ) for _ in range(num_blocks[0])]
         )
@@ -268,21 +239,21 @@ class SpachTransformer(nn.Module):
         # Define other encoder levels and downsampling steps
         self.down1_2 = DownsampleSimple(dim)
         self.encoder_level2 = nn.Sequential(
-            *[TransformerBlockSimple(dim=int(dim*2), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim*2), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[1])]
         )
 
         self.down2_3 = DownsampleSimple(int(dim*2))
         self.encoder_level3 = nn.Sequential(
-            *[TransformerBlockSimple(dim=int(dim*4), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim*4), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[2])]
         )
 
         self.down3_4 = DownsampleSimple(int(dim*4))
         self.latent = nn.Sequential(
-            *[TransformerBlockSimple(dim=int(dim*8), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim*8), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[3])]
         )
@@ -293,7 +264,7 @@ class SpachTransformer(nn.Module):
         self.up4_3 = UpsampleSimple(int(dim * 8))
         self.reduce_chan_level3 = nn.Conv3d(int(dim * 8), int(dim * 4), kernel_size=1, bias=bias)
         self.decoder_level3 = nn.Sequential(
-            *[TransformerBlockSimple(dim=int(dim * 4), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim * 4), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[2])]
         )
@@ -301,21 +272,21 @@ class SpachTransformer(nn.Module):
         self.up3_2 = UpsampleSimple(int(dim * 4))
         self.reduce_chan_level2 = nn.Conv3d(int(dim * 4), int(dim * 2), kernel_size=1, bias=bias)
         self.decoder_level2 = nn.Sequential(
-            *[TransformerBlockSimple(dim=int(dim * 2), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=int(dim * 2), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[1])]
         )
 
         self.up2_1 = UpsampleSimple(int(dim * 2))
         self.decoder_level1 = nn.Sequential(
-            *[TransformerBlockSimple(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(num_blocks[0])]
         )
 
         # Refinement blocks (optional)
         self.refinement = nn.Sequential(
-            *[TransformerBlockSimple(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
+            *[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
                                      ) for _ in range(3)]  # Number of refinement blocks can be adjusted
         )
