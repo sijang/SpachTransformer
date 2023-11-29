@@ -216,8 +216,7 @@ class SpachTransformer(nn.Module):
     """
     def __init__(self, inp_channels=1, out_channels=1, dim=16, num_blocks=[4, 6, 6, 8],
                  heads=[1, 2, 4, 8], ffn_expansion_factor=1, bias=False,
-                 layer_norm_type='WithBias', conv_type=0, pre_post_norm=0, locked_attn=0,
-                 swin_stages=2, mr=0, cross=0, dual_pixel_task=False):
+                 layer_norm_type='WithBias'):
         super().__init__()
 
         # Initialize parameters and configurations
