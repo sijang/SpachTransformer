@@ -256,7 +256,7 @@ class SpachTransformer(nn.Module):
 
         # Decoder layers
         self.up4_3 = UpsampleSimple(int(dim * 8))
-        self.reduce_chan_level3 = nn.Conv3d(int(dim * 8), int(dim * 4), kernel_size=1, bias=bias)
+        self.reduce_chan_level3 = nn.Conv3d(int(dim * 8)+int(dim*4), int(dim * 4), kernel_size=1, bias=bias)
         self.decoder_level3 = nn.Sequential(
             *[TransformerBlock(dim=int(dim * 4), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, 
                                      bias=bias, layer_norm_type=layer_norm_type, 
