@@ -210,87 +210,74 @@ class UpsampleSimple(nn.Module):
         return self.body(x)
 
 
+import torch
+import torch.nn as nn
+
 class Restormer(nn.Module):
     def __init__(self, inp_channels=1, out_channels=1, dim=32, num_blocks=[2,2,2,6], 
-                 num_refinement_blocks=1, heads=[1,1,1,1], ffn_expansion_factor=2.66, bias=False, 
-                 layer_norm_type='WithBias'):
+                 num_refinement_blocks=1, heads=[1,1,1,1], ffn_expansion_factor=2.66, 
+                 bias=False, LayerNorm_type='WithBias', dual_pixel_task=False):
         super(Restormer, self).__init__()
 
-        # Initialize Patch Embedding
         self.patch_embed = OverlapPatchEmbed(inp_channels, dim)
 
-        # Encoder Layers
-        self.encoder_layers = nn.ModuleList()
-        for i in range(4):
-            layer_dim = dim // (2 ** i)
-            self.encoder_layers.append(nn.Sequential(*[
-                TransformerBlock(dim=layer_dim, num_heads=heads[i], ffn_expansion_factor=ffn_expansion_factor, 
-                                 bias=bias, layer_norm_type=layer_norm_type) 
-                for _ in range(num_blocks[i])
-            ]))
+        self.encoder_level1 = nn.Sequential(*[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[0])])
+        
+        self.down1_2 = Downsample(dim) 
+        self.encoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[1])])
+        
+        self.down2_3 = Downsample(int(dim//2**1)) 
+        self.encoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[2])])
 
-        # Downsampling Layers
-        self.downsample_layers = nn.ModuleList([Downsample(dim // (2 ** i)) for i in range(3)])
+        self.down3_4 = Downsample(int(dim//2**2))
+        self.latent = nn.Sequential(*[TransformerBlock(dim=int(dim//2**3), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[3])])
+        
+        self.up4_3 = Upsample(int(dim//2**3)) 
+        self.reduce_chan_level3 = nn.Conv3d(int(dim//2**1), int(dim//2**2), kernel_size=1, bias=bias)
+        self.decoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[2])])
 
-        # Latent Layer
-        self.latent = self.encoder_layers[-1]
+        self.up3_2 = Upsample(int(dim//2**2)) 
+        self.reduce_chan_level2 = nn.Conv3d(int(dim//2**0), int(dim//2**1), kernel_size=1, bias=bias)
+        self.decoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[1])])
+        
+        self.up2_1 = Upsample(int(dim//2**1))  
 
-        # Upsampling and Decoder Layers
-        self.upsample_layers = nn.ModuleList([Upsample(dim // (2 ** (i + 1))) for i in range(3)])
-        self.decoder_layers = nn.ModuleList()
-        for i in range(3, 0, -1):
-            layer_dim = dim // (2 ** i)
-            self.decoder_layers.append(nn.Sequential(*[
-                TransformerBlock(dim=layer_dim, num_heads=heads[i-1], ffn_expansion_factor=ffn_expansion_factor, 
-                                 bias=bias, layer_norm_type=layer_norm_type) 
-                for _ in range(num_blocks[i-1])
-            ]))
-
-        # Channel Reduction Layers
-        self.reduce_chan_layers = nn.ModuleList([
-            nn.Conv3d(dim // (2 ** i), dim // (2 ** (i + 1)), kernel_size=1, bias=bias) for i in range(1, 3)
-        ])
-
-        # Refinement Layer
-        self.refinement = nn.Sequential(*[TransformerBlock(dim=dim*2, num_heads=heads[0], 
-                                                           ffn_expansion_factor=ffn_expansion_factor, 
-                                                           bias=bias, layer_norm_type=layer_norm_type) 
-                                          for _ in range(num_refinement_blocks)])
-
-
-        # Output Layer
-        self.output = nn.Conv3d(dim*2, out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
-
+        self.decoder_level1 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[0])])
+        
+        self.refinement = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_refinement_blocks)])
+                    
+        self.output  = nn.Conv3d(int(dim*2**1), out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
+        
     def forward(self, inp_img):
-        x = self.patch_embed(inp_img)
+        inp_enc_level1 = self.patch_embed(inp_img)
+        out_enc_level1 = self.encoder_level1(inp_enc_level1)
 
-        # Encoder
-        skip_connections = []
-        for i in range(4):
-            x = self.encoder_layers[i](x)
-            if i < 3:
-                skip_connections.append(x)
-                x = self.downsample_layers[i](x)
+        inp_enc_level2 = self.down1_2(out_enc_level1)
+        out_enc_level2 = self.encoder_level2(inp_enc_level2)
 
-        # Latent
-        latent = self.latent(x)
+        inp_enc_level3 = self.down2_3(out_enc_level2)
+        out_enc_level3 = self.encoder_level3(inp_enc_level3) 
 
-        # Decoder
-        for i in range(3):
-            x = self.upsample_layers[i](latent)
-            x = torch.cat([x, skip_connections[2-i]], 1)
-            if i < 2:
-                x = self.reduce_chan_layers[i](x)
-            x = self.decoder_layers[i](x)
+        inp_enc_level4 = self.down3_4(out_enc_level3)        
+        latent = self.latent(inp_enc_level4) 
+                        
+        inp_dec_level3 = self.up4_3(latent)
+        inp_dec_level3 = torch.cat([inp_dec_level3, out_enc_level3], 1)
+        inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3)
+        out_dec_level3 = self.decoder_level3(inp_dec_level3) 
 
-        # Refinement
-        x = self.refinement(x)
+        inp_dec_level2 = self.up3_2(out_dec_level3)
+        inp_dec_level2 = torch.cat([inp_dec_level2, out_enc_level2], 1)
+        inp_dec_level2 = self.reduce_chan_level2(inp_dec_level2)
+        out_dec_level2 = self.decoder_level2(inp_dec_level2) 
 
-        # Dual-Pixel Task
-        if self.dual_pixel_task:
-            x = x + self.skip_conv(skip_connections[0])
-            x = self.output(x)
-        else:
-            x = self.output(x) + inp_img
+        inp_dec_level1 = self.up2_1(out_dec_level2)
+        inp_dec_level1 = torch.cat([inp_dec_level1, out_enc_level1], 1)
+        out_dec_level1 = self.decoder_level1(inp_dec_level1)
+        
+        out_dec_level1 = self.refinement(out_dec_level1)
 
-        return x
+        out_dec_level1 = self.output(out_dec_level1) + inp_img
+            
+        return out_dec_level1
+
