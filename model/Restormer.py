@@ -213,7 +213,7 @@ class UpsampleSimple(nn.Module):
 class Restormer(nn.Module):
     def __init__(self, inp_channels=1, out_channels=1, dim=32, num_blocks=[2,2,2,6], 
                  num_refinement_blocks=1, heads=[1,1,1,1], ffn_expansion_factor=2.66, bias=False, 
-                 LayerNorm_type='WithBias', dual_pixel_task=False):
+                 layer_norm_type='WithBias'):
         super(Restormer, self).__init__()
 
         # Initialize Patch Embedding
@@ -225,7 +225,7 @@ class Restormer(nn.Module):
             layer_dim = dim // (2 ** i)
             self.encoder_layers.append(nn.Sequential(*[
                 TransformerBlock(dim=layer_dim, num_heads=heads[i], ffn_expansion_factor=ffn_expansion_factor, 
-                                 bias=bias, LayerNorm_type=LayerNorm_type) 
+                                 bias=bias, layer_norm_type=layer_norm_type) 
                 for _ in range(num_blocks[i])
             ]))
 
@@ -242,7 +242,7 @@ class Restormer(nn.Module):
             layer_dim = dim // (2 ** i)
             self.decoder_layers.append(nn.Sequential(*[
                 TransformerBlock(dim=layer_dim, num_heads=heads[i-1], ffn_expansion_factor=ffn_expansion_factor, 
-                                 bias=bias, LayerNorm_type=LayerNorm_type) 
+                                 bias=bias, layer_norm_type=layer_norm_type) 
                 for _ in range(num_blocks[i-1])
             ]))
 
@@ -254,13 +254,9 @@ class Restormer(nn.Module):
         # Refinement Layer
         self.refinement = nn.Sequential(*[TransformerBlock(dim=dim*2, num_heads=heads[0], 
                                                            ffn_expansion_factor=ffn_expansion_factor, 
-                                                           bias=bias, LayerNorm_type=LayerNorm_type) 
+                                                           bias=bias, layer_norm_type=layer_norm_type) 
                                           for _ in range(num_refinement_blocks)])
 
-        # Dual-Pixel Task specific layer
-        self.dual_pixel_task = dual_pixel_task
-        if self.dual_pixel_task:
-            self.skip_conv = nn.Conv3d(dim, dim*2, kernel_size=1, bias=bias)
 
         # Output Layer
         self.output = nn.Conv3d(dim*2, out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
