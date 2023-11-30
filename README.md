@@ -22,11 +22,15 @@ See [INSTALL.md](INSTALL.md) for the installation of dependencies required to ru
 ### Quick Run
 ```python
 import torch
-from model.SpachTransformer import SpachTransformer
+from model.SpachTransformer  import SpachTransformer
+from model.Restormer         import Restormer
 
 input   = torch.rand(1, 1, 96, 96, 96)
-model   = SpachTransformer()
-output  = model(input)
+model1  = SpachTransformer()
+output  = model1(input)
+
+model2  = Restormer()
+output  = model2(input)
 ```
 
 <hr />
