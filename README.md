@@ -17,7 +17,7 @@
 ### Installation
 
 See [INSTALL.md](INSTALL.md) for the installation of dependencies required to run Spach Transformer.
-Do the following for a newer GPU
+Do the following for a newer GPU (after activating your conda)
 ```python
 pip install --upgrade torch torchvision torchaudio
 ```
