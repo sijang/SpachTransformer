@@ -73,7 +73,7 @@ class LayerNorm(nn.Module):
         h, w, d = x.shape[-3:]
         return to_4d(self.body(to_3d(x)), h, w, d)
 
-class FeedForward(nn.Module):
+class GDFN(nn.Module):
     """
     Implements a Gated-Dconv Feed-Forward Network (GDFN) module.
     """
@@ -83,6 +83,25 @@ class FeedForward(nn.Module):
         self.md = hidden_features * 2
         self.project_in = nn.Conv3d(dim, self.md, kernel_size=1, bias=bias)
         self.dwconv = nn.Conv3d(self.md, self.md, kernel_size=3, stride=1, padding=1, groups=self.md, bias=bias)
+        self.project_out = nn.Conv3d(hidden_features, dim, kernel_size=1, bias=bias)
+
+    def forward(self, x):
+        x = self.project_in(x)
+        x1, x2 = self.dwconv(x).chunk(2, dim=1)
+        x = F.gelu(x1) * x2
+        x = self.project_out(x)
+        return x
+
+class GCFN(nn.Module):
+    """
+    Implements a Gated-Conv Feed-Forward Network (GCFN) module.
+    """
+    def __init__(self, dim, ffn_expansion_factor, bias):
+        super().__init__()
+        hidden_features = int(dim * ffn_expansion_factor)
+        self.md = hidden_features * 2
+        self.project_in = nn.Conv3d(dim, self.md, kernel_size=1, bias=bias)
+        self.dwconv = nn.Conv3d(self.md, self.md, kernel_size=3, stride=1, padding=1, bias=bias)
         self.project_out = nn.Conv3d(hidden_features, dim, kernel_size=1, bias=bias)
 
     def forward(self, x):
@@ -133,11 +152,16 @@ class TransformerBlock(nn.Module):
         self.norm1 = LayerNorm(dim, layer_norm_type)
         self.attn = Attention(dim, num_heads, bias)
         self.norm2 = LayerNorm(dim, layer_norm_type)
-        self.ffn = FeedForward(dim, ffn_expansion_factor, bias)
+        self.gdfn  = GDFN(dim, ffn_expansion_factor, bias)
+        self.norm3 = LayerNorm(dim, layer_norm_type)
+        self.gcfn = GCFN(dim, ffn_expansion_factor, bias)
+        
 
     def forward(self, x):
         x = x + self.attn(self.norm1(x))
-        x = x + self.ffn(self.norm2(x))
+        x = x + self.gdfn(self.norm2(x))
+        x = x + self.gcfn(self.norm3(x))
+        
         return x
 
 
