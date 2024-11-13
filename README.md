@@ -25,7 +25,7 @@ pip install --upgrade torch torchvision torchaudio
 
 
 
-### Quick Run
+### Quick Run with a single sample
 ```python
 import torch
 from model.SpachTransformer  import SpachTransformer
@@ -37,6 +37,11 @@ output  = model1(input)
 
 model2  = Restormer()
 output  = model2(input)
+```
+
+### Quick Run with a training code
+```python
+python train.py
 ```
 
 <hr />
