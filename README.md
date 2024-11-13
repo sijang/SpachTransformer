@@ -63,7 +63,7 @@ If you use Spach Transformer, please consider citing:
 
 
 ### Contact
-Should you have any question, please contact sjang7@mgh.harvard.edu
+Should you have any question, please contact sein.jang@yale.edu
 
 
 **Acknowledgment:** This code is based on the [Restormer](https://github.com/swz30/Restormer) and [Swin Transformer](https://github.com/microsoft/Swin-Transformer).
