@@ -238,13 +238,14 @@ class SpachTransformer(nn.Module):
     """
     SpachTransformer model combining Swin Transformer and Restormer architectures for image processing tasks.
     """
-    def __init__(self, inp_channels=1, out_channels=1, dim=16, num_blocks=[4, 6, 6, 8],
+    def __init__(self, inp_channels=1, out_channels=1, dim=16, num_blocks=[1, 1, 1, 1],
                  heads=[1, 2, 4, 8], ffn_expansion_factor=1, bias=False,
-                 layer_norm_type='WithBias'):
+                 layer_norm_type='WithBias', swin_window_size=(6, 6, 6)):
         super().__init__()
 
         # Initialize parameters and configurations
         self.patch_embed = OverlapPatchEmbed(inp_channels, dim)
+        self.swin_window_size = swin_window_size
 
         # Encoder layers
         self.encoder_level1 = nn.Sequential(
@@ -316,12 +317,12 @@ class SpachTransformer(nn.Module):
         swin_depths      = (4, 8)
         swin_num_heads   = (4, 8)
         swin_out_indices = (0, 1)
-        window_size      = (6, 6, 6)
+        swin_window_size = self.swin_window_size
 
         # Swin Transformer instantiation
         self.swin = SwinTransformer(
             patch_size=4, in_chans=inp_channels, embed_dim=dim*2**2,
-            depths=swin_depths, num_heads=swin_num_heads, window_size=window_size,
+            depths=swin_depths, num_heads=swin_num_heads, window_size=swin_window_size,
             mlp_ratio=4, qkv_bias=False, drop_rate=0, drop_path_rate=0.3,
             ape=True, spe=False, patch_norm=True, use_checkpoint=False, 
             out_indices=swin_out_indices, pat_merg_rf=4, pos_embed_method='relative'
@@ -371,4 +372,5 @@ class SpachTransformer(nn.Module):
         out_dec_level1 = self.output(out_dec_level1) + inp_img
 
         return out_dec_level1
+
 
