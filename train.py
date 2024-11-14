@@ -32,7 +32,7 @@ def train_model(simulated_img_size=128, num_epochs=20, batch_size=1, learning_ra
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
     # Initialize the model
-    model = SpachTransformer(swin_window_size=swin_window_size)
+    model = SpachTransformer(swin_window_size=swin_window_size, num_blocks=[1, 1, 1, 1])
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = model.to(device)
 
