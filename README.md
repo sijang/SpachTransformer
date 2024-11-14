@@ -41,7 +41,9 @@ output  = model2(input)
 
 ### Quick Run with a training code
 ```python
-python train.py
+python train.py --simulated_img_size 48 --num_epochs 25 --batch_size 1 --learning_rate 0.0001
+python train.py --simulated_img_size 96 --num_epochs 25 --batch_size 1 --learning_rate 0.0001
+python train.py --simulated_img_size 128 --num_epochs 25 --batch_size 1 --learning_rate 0.0001
 ```
 
 <hr />
