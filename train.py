@@ -93,7 +93,7 @@ def train_model(simulated_img_size=128, num_epochs=20, batch_size=1, learning_ra
         print(f"Epoch [{epoch+1}/{num_epochs}], Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
 
     # Save the trained model
-    torch.save(model.state_dict(), "trained_model.pth")
+    # torch.save(model.state_dict(), "trained_model.pth")
 
 # Main function to parse arguments
 if __name__ == "__main__":
