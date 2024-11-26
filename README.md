@@ -19,6 +19,7 @@
 See [INSTALL.md](INSTALL.md) for the installation of dependencies required to run Spach Transformer.
 Do the following for a newer GPU (after activating your conda)
 ```python
+pip install spach-transformer
 pip install --upgrade torch torchvision torchaudio
 ```
 
@@ -28,8 +29,7 @@ pip install --upgrade torch torchvision torchaudio
 ### Quick Run with a single sample
 ```python
 import torch
-from models.SpachTransformer  import SpachTransformer
-from models.Restormer         import Restormer
+from models import SpachTransformer, Restormer, SwinTransformer
 
 input   = torch.rand(1, 1, 96, 96, 96)
 model1  = SpachTransformer()
