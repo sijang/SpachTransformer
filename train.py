@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-from models.SpachTransformer import SpachTransformer
+
+from models import SpachTransformer
 
 # Define the custom dataset
 class CustomDataset(Dataset):
