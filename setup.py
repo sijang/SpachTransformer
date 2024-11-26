@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='spach-transformer',   
-    version='0.1.0',
+    version="0.1.1",   
     author='sijang',
     author_email='sein.jang@yale.edu',
     description='A package for SpachTransformer and related models',
