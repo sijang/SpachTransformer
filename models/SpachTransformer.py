@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
-from model.SwinTransformer import SwinTransformer
+from models.SwinTransformer import SwinTransformer
 
 def to_3d(x):
     """
