@@ -28,8 +28,8 @@ pip install --upgrade torch torchvision torchaudio
 ### Quick Run with a single sample
 ```python
 import torch
-from model.SpachTransformer  import SpachTransformer
-from model.Restormer         import Restormer
+from models.SpachTransformer  import SpachTransformer
+from models.Restormer         import Restormer
 
 input   = torch.rand(1, 1, 96, 96, 96)
 model1  = SpachTransformer()
