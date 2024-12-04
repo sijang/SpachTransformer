@@ -61,11 +61,12 @@ python train.py --simulated_img_size 128 --num_epochs 25 --batch_size 1 --learni
 ### Citation
 If you use Spach Transformer, please consider citing:
 
-    @article{jang2022spach, 
-        title={Spach Transformer: Spatial and channel-wise transformer based on local and global self-attentions for PET image denoising}, 
-        author={Jang, Se-In and Pan, Tinsu and Li, Ye and Heidari, Pedram and Chen, Junyu and Li, Quanzheng and Gong, Kuang}, 
-        journal={arXiv preprint arXiv:2209.03300}, 
-        year={2022} }
+    @article{jang2023spach,
+      title={Spach Transformer: Spatial and channel-wise transformer based on local and global self-attentions for PET image denoising},
+      author={Jang, Se-In and Pan, Tinsu and Li, Ye and Heidari, Pedram and Chen, Junyu and Li, Quanzheng and Gong, Kuang},
+      journal={IEEE transactions on medical imaging},
+      year={2023},
+      publisher={IEEE}
     }
 
 
