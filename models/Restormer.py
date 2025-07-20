@@ -224,23 +224,23 @@ class Restormer(nn.Module):
         self.encoder_level1 = nn.Sequential(*[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[0])])
         
         self.down1_2 = Downsample(dim) 
-        self.encoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[1])])
+        self.encoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[1])])
         
-        self.down2_3 = Downsample(int(dim//2**1)) 
-        self.encoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[2])])
+        self.down2_3 = Downsample(int(dim*2**1)) 
+        self.encoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[2])])
 
-        self.down3_4 = Downsample(int(dim//2**2))
-        self.latent = nn.Sequential(*[TransformerBlock(dim=int(dim//2**3), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[3])])
+        self.down3_4 = Downsample(int(dim*2**2))
+        self.latent = nn.Sequential(*[TransformerBlock(dim=int(dim*2**3), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[3])])
         
-        self.up4_3 = Upsample(int(dim//2**3)) 
-        self.reduce_chan_level3 = nn.Conv3d(int(dim//2**1), int(dim//2**2), kernel_size=1, bias=bias)
-        self.decoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[2])])
+        self.up4_3 = Upsample(int(dim*2**3)) 
+        self.reduce_chan_level3 = nn.Conv3d(int(dim*2**1), int(dim*2**2), kernel_size=1, bias=bias)
+        self.decoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[2])])
 
-        self.up3_2 = Upsample(int(dim//2**2)) 
-        self.reduce_chan_level2 = nn.Conv3d(int(dim//2**0), int(dim//2**1), kernel_size=1, bias=bias)
-        self.decoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim//2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[1])])
+        self.up3_2 = Upsample(int(dim*2**2)) 
+        self.reduce_chan_level2 = nn.Conv3d(int(dim*2**0), int(dim*2**1), kernel_size=1, bias=bias)
+        self.decoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[1])])
         
-        self.up2_1 = Upsample(int(dim//2**1))  
+        self.up2_1 = Upsample(int(dim*2**1))  
 
         self.decoder_level1 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, layer_norm_type=layer_norm_type) for i in range(num_blocks[0])])
         
